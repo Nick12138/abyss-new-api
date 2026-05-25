@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { parseCurrencyDisplayType } from '@/lib/currency'
 import { CheckinSettingsSection } from '../general/checkin-settings-section'
+import { FreeRequestGrantSettingsSection } from '../general/free-request-grant-settings-section'
 import { PricingSection } from '../general/pricing-section'
 import { QuotaSettingsSection } from '../general/quota-settings-section'
 import { PaymentSettingsSection } from '../integrations/payment-settings-section'
@@ -196,6 +197,15 @@ const BILLING_SECTIONS = [
           minQuota: settings['checkin_setting.min_quota'],
           maxQuota: settings['checkin_setting.max_quota'],
         }}
+      />
+    ),
+  },
+  {
+    id: 'free-request-grant',
+    titleKey: 'Free Request Grants',
+    build: (settings: BillingSettings) => (
+      <FreeRequestGrantSettingsSection
+        defaultValues={settings.FreeRequestGrantSetting}
       />
     ),
   },

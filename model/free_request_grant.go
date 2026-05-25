@@ -103,14 +103,14 @@ func freeRequestGrantGroupCol() string {
 
 func DefaultFreeRequestGrantSetting() FreeRequestGrantSetting {
 	return FreeRequestGrantSetting{
-		Enabled:                      true,
-		Group:                        "会员体验",
+		Enabled:                      false,
+		Group:                        "",
 		AdminSwitchEnabled:           true,
 		AdminSwitchCount:             500,
 		AdminSwitchValidDays:         3,
 		DailyBalanceEnabled:          true,
 		DailyBalanceCount:            100,
-		DailyBalanceThreshold:        0.1,
+		DailyBalanceThreshold:        0,
 		DailyBalanceExpireAtMidnight: true,
 		CampaignEndTime:              0,
 		DeductCountPerSuccess:        1,
@@ -143,7 +143,7 @@ func GetFreeRequestGrantSetting() FreeRequestGrantSetting {
 		return DefaultFreeRequestGrantSetting()
 	}
 	if strings.TrimSpace(setting.Group) == "" {
-		setting.Group = "会员体验"
+		setting.Group = ""
 	}
 	// [FIX #4] Ensure DeductCountPerSuccess has a minimum of 1
 	if setting.DeductCountPerSuccess <= 0 {
