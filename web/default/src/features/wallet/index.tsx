@@ -30,6 +30,8 @@ import { TransferDialog } from './components/dialogs/transfer-dialog'
 import { RechargeFormCard } from './components/recharge-form-card'
 import { SubscriptionPlansCard } from './components/subscription-plans-card'
 import { WalletStatsCard } from './components/wallet-stats-card'
+import { FreeRequestGrantsCard } from './components/free-request-grants-card'
+import { getFreeRequestGrantSummary } from './api'
 import { DEFAULT_DISCOUNT_RATE } from './constants'
 import {
   useTopupInfo,
@@ -47,6 +49,7 @@ import {
 } from './lib'
 import type {
   UserWalletData,
+  FreeRequestGrantSummary,
   PaymentMethod,
   PresetAmount,
   CreemProduct,
@@ -59,6 +62,10 @@ interface WalletProps {
 export function Wallet(props: WalletProps) {
   const { t } = useTranslation()
   const [user, setUser] = useState<UserWalletData | null>(null)
+  const [freeRequestSummary, setFreeRequestSummary] =
+    useState<FreeRequestGrantSummary | null>(null)
+  const [freeRequestSummaryLoading, setFreeRequestSummaryLoading] =
+    useState(true)
   const [userLoading, setUserLoading] = useState(true)
   const [topupAmount, setTopupAmount] = useState(0)
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null)
@@ -119,9 +126,25 @@ export function Wallet(props: WalletProps) {
     }
   }, [])
 
+  const fetchFreeRequestSummary = useCallback(async () => {
+    try {
+      setFreeRequestSummaryLoading(true)
+      const response = await getFreeRequestGrantSummary()
+      if (response.success && response.data) {
+        setFreeRequestSummary(response.data)
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to fetch free request grants:', error)
+    } finally {
+      setFreeRequestSummaryLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
     fetchUser()
-  }, [fetchUser])
+    fetchFreeRequestSummary()
+  }, [fetchUser, fetchFreeRequestSummary])
 
   useEffect(() => {
     if (props.initialShowHistory) {
@@ -192,7 +215,7 @@ export function Wallet(props: WalletProps) {
 
     if (success) {
       setConfirmDialogOpen(false)
-      await fetchUser()
+      await Promise.all([fetchUser(), fetchFreeRequestSummary()])
     }
   }
 
@@ -203,7 +226,7 @@ export function Wallet(props: WalletProps) {
     const success = await redeemCode(redemptionCode)
     if (success) {
       setRedemptionCode('')
-      await fetchUser()
+      await Promise.all([fetchUser(), fetchFreeRequestSummary()])
     }
   }
 
@@ -211,7 +234,7 @@ export function Wallet(props: WalletProps) {
   const handleTransfer = async (amount: number) => {
     const success = await transferQuota(amount)
     if (success) {
-      await fetchUser()
+      await Promise.all([fetchUser(), fetchFreeRequestSummary()])
     }
     return success
   }
@@ -230,7 +253,7 @@ export function Wallet(props: WalletProps) {
     if (success) {
       setCreemDialogOpen(false)
       setSelectedCreemProduct(null)
-      await fetchUser()
+      await Promise.all([fetchUser(), fetchFreeRequestSummary()])
     }
   }
 
@@ -264,6 +287,11 @@ export function Wallet(props: WalletProps) {
         <SectionPageLayout.Content>
           <div className='mx-auto flex w-full max-w-7xl flex-col gap-4 sm:gap-5'>
             <WalletStatsCard user={user} loading={userLoading} />
+
+            <FreeRequestGrantsCard
+              summary={freeRequestSummary}
+              loading={freeRequestSummaryLoading}
+            />
 
             <div
               className={

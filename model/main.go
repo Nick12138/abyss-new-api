@@ -278,11 +278,15 @@ func migrateDB() error {
 		&SubscriptionOrder{},
 		&UserSubscription{},
 		&SubscriptionPreConsumeRecord{},
+		&FreeRequestGrant{},
 		&CustomOAuthProvider{},
 		&UserOAuthBinding{},
 		&PerfMetric{},
 	)
 	if err != nil {
+		return err
+	}
+	if err := CreateDefaultFreeRequestGrantOptionIfNeed(); err != nil {
 		return err
 	}
 	if common.UsingSQLite {
@@ -327,6 +331,7 @@ func migrateDBFast() error {
 		{&SubscriptionOrder{}, "SubscriptionOrder"},
 		{&UserSubscription{}, "UserSubscription"},
 		{&SubscriptionPreConsumeRecord{}, "SubscriptionPreConsumeRecord"},
+		{&FreeRequestGrant{}, "FreeRequestGrant"},
 		{&CustomOAuthProvider{}, "CustomOAuthProvider"},
 		{&UserOAuthBinding{}, "UserOAuthBinding"},
 		{&PerfMetric{}, "PerfMetric"},
@@ -362,6 +367,9 @@ func migrateDBFast() error {
 		if err := DB.AutoMigrate(&SubscriptionPlan{}); err != nil {
 			return err
 		}
+	}
+	if err := CreateDefaultFreeRequestGrantOptionIfNeed(); err != nil {
+		return err
 	}
 	common.SysLog("database migrated")
 	return nil

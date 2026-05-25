@@ -22,6 +22,13 @@ type FundingSource interface {
 	Refund() error
 }
 
+type FreeRequestGrantFunding struct{}
+
+func (f *FreeRequestGrantFunding) Source() string              { return BillingSourceFreeRequestGrant }
+func (f *FreeRequestGrantFunding) PreConsume(amount int) error { return nil }
+func (f *FreeRequestGrantFunding) Settle(delta int) error      { return nil }
+func (f *FreeRequestGrantFunding) Refund() error               { return nil }
+
 // ---------------------------------------------------------------------------
 // WalletFunding — 钱包资金来源实现
 // ---------------------------------------------------------------------------

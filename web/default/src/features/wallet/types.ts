@@ -41,6 +41,8 @@ export type PaymentResponse = ApiResponse<Record<string, unknown>> & {
 export type StripePaymentResponse = ApiResponse<{ pay_link: string }>
 export type AffiliateCodeResponse = ApiResponse<string>
 export type AffiliateTransferResponse = ApiResponse
+export type FreeRequestGrantSummaryResponse =
+  ApiResponse<FreeRequestGrantSummary>
 export type CreemPaymentResponse = ApiResponse<{ checkout_url: string }>
 export type WaffoPaymentResponse = ApiResponse<
   { payment_url?: string } | string
@@ -242,6 +244,48 @@ export interface UserWalletData {
   aff_count: number
   /** User group */
   group: string
+}
+
+/**
+ * Free request grant status shown on the wallet page.
+ */
+export type FreeRequestGrantItemStatus =
+  | 'active'
+  | 'available'
+  | 'pending'
+  | 'used_up'
+  | 'expired'
+  | 'disabled'
+  | 'not_activated'
+
+/**
+ * Current free request grant item.
+ */
+export interface FreeRequestGrantSummaryItem {
+  type: 'daily_balance' | 'admin_group_switch' | 'activation'
+  status: FreeRequestGrantItemStatus
+  remaining: number
+  total: number
+  start_time: number
+  end_time: number
+  reset_time: number
+  group: string
+  message?: string
+  balance_needed?: boolean
+}
+
+/**
+ * Current free request grant summary.
+ */
+export interface FreeRequestGrantSummary {
+  enabled: boolean
+  group: string
+  user_group: string
+  activated: boolean
+  balance_qualified: boolean
+  balance_threshold: number
+  now: number
+  items: FreeRequestGrantSummaryItem[]
 }
 
 /**

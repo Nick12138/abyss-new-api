@@ -30,6 +30,7 @@ import type {
   StripePaymentResponse,
   AffiliateCodeResponse,
   AffiliateTransferResponse,
+  FreeRequestGrantSummaryResponse,
   BillingHistoryResponse,
   CompleteOrderRequest,
   CreemPaymentRequest,
@@ -173,6 +174,14 @@ export async function requestWaffoPancakePayment(
  */
 export async function getAffiliateCode(): Promise<AffiliateCodeResponse> {
   const res = await api.get('/api/user/aff')
+  return res.data
+}
+
+/**
+ * Get current free request grant summary for wallet display
+ */
+export async function getFreeRequestGrantSummary(): Promise<FreeRequestGrantSummaryResponse> {
+  const res = await api.get('/api/user/free_request_grants/self')
   return res.data
 }
 

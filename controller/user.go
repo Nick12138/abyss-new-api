@@ -563,9 +563,23 @@ func GetUserModels(c *gin.Context) {
 	return
 }
 
+func GetSelfFreeRequestGrants(c *gin.Context) {
+	userId := c.GetInt("id")
+	summary, err := model.GetFreeRequestGrantSummary(userId)
+	if err != nil {
+		common.ApiError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data":    summary,
+	})
+}
+
 func UpdateUser(c *gin.Context) {
 	var updatedUser model.User
-	err := json.NewDecoder(c.Request.Body).Decode(&updatedUser)
+	err := common.DecodeJson(c.Request.Body, &updatedUser)
 	if err != nil || updatedUser.Id == 0 {
 		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
 		return
@@ -596,6 +610,10 @@ func UpdateUser(c *gin.Context) {
 	}
 	updatePassword := updatedUser.Password != ""
 	if err := updatedUser.Edit(updatePassword); err != nil {
+		common.ApiError(c, err)
+		return
+	}
+	if _, err := model.CreateAdminFreeRequestGrantOnGroupSwitch(updatedUser.Id, originUser.Group, updatedUser.Group); err != nil {
 		common.ApiError(c, err)
 		return
 	}

@@ -45,6 +45,10 @@ func (s *BillingSession) Settle(actualQuota int) error {
 		return nil
 	}
 	delta := actualQuota - s.preConsumedQuota
+	if s.funding.Source() == BillingSourceFreeRequestGrant {
+		s.settled = true
+		return nil
+	}
 	if delta == 0 {
 		s.settled = true
 		return nil
@@ -154,6 +158,9 @@ func (s *BillingSession) Reserve(targetQuota int) error {
 	defer s.mu.Unlock()
 
 	if s.settled || s.refunded || s.trusted || targetQuota <= s.preConsumedQuota {
+		return nil
+	}
+	if s.funding.Source() == BillingSourceFreeRequestGrant {
 		return nil
 	}
 
@@ -431,4 +438,13 @@ func NewBillingSession(c *gin.Context, relayInfo *relaycommon.RelayInfo, preCons
 		}
 		return session, nil
 	}
+}
+
+func NewFreeRequestGrantBillingSession(relayInfo *relaycommon.RelayInfo) *BillingSession {
+	session := &BillingSession{
+		relayInfo: relayInfo,
+		funding:   &FreeRequestGrantFunding{},
+	}
+	session.syncRelayInfo()
+	return session
 }
