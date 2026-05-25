@@ -106,7 +106,7 @@ const defaultBillingSettings: BillingSettings = {
   'checkin_setting.min_quota': 1000,
   'checkin_setting.max_quota': 10000,
   FreeRequestGrantSetting:
-    '{"enabled":false,"group":"","admin_switch_count":500,"admin_switch_valid_days":3,"daily_balance_count":100,"daily_balance_threshold":0,"deduct_count_per_success":1}',
+    '{"enabled":false,"group":"","admin_switch_count":500,"admin_switch_valid_hours":72,"daily_balance_count":100,"daily_balance_threshold":0,"deduct_count_per_success":1,"model_deduct_counts":{}}',
 }
 
 export function BillingSettings() {

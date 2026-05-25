@@ -51,11 +51,11 @@ const schema = z.object({
   enabled: z.boolean(),
   group: z.string(),
   admin_switch_count: z.coerce.number().int().min(0),
-  admin_switch_valid_days: z.coerce.number().int().min(1),
+  admin_switch_valid_hours: z.coerce.number().int().min(1),
   daily_balance_count: z.coerce.number().int().min(0),
   daily_balance_threshold: z.coerce.number().min(0),
   deduct_count_per_success: z.coerce.number().int().min(1),
-  model_deduct_counts: z.record(z.coerce.number().int().min(1)),
+  model_deduct_counts: z.record(z.string(), z.coerce.number().int().min(1)),
 })
 
 type Values = z.infer<typeof schema>
@@ -64,7 +64,7 @@ const DEFAULT_VALUES: Values = {
   enabled: false,
   group: '',
   admin_switch_count: 500,
-  admin_switch_valid_days: 3,
+  admin_switch_valid_hours: 72,
   daily_balance_count: 100,
   daily_balance_threshold: 0,
   deduct_count_per_success: 1,
@@ -80,8 +80,8 @@ function parseSetting(jsonStr?: string): Values {
       group: parsed.group ?? DEFAULT_VALUES.group,
       admin_switch_count:
         parsed.admin_switch_count ?? DEFAULT_VALUES.admin_switch_count,
-      admin_switch_valid_days:
-        parsed.admin_switch_valid_days ?? DEFAULT_VALUES.admin_switch_valid_days,
+      admin_switch_valid_hours:
+        parsed.admin_switch_valid_hours ?? DEFAULT_VALUES.admin_switch_valid_hours,
       daily_balance_count:
         parsed.daily_balance_count ?? DEFAULT_VALUES.daily_balance_count,
       daily_balance_threshold:
@@ -166,7 +166,7 @@ export function FreeRequestGrantSettingsSection({
     const defaultCount = form.getValues('deduct_count_per_success') || 1
     const newCounts: Record<string, number> = {}
     for (const modelName of models) {
-      newCounts[modelName] = currentCounts[modelName] ?? defaultCount
+      newCounts[modelName] = (currentCounts as Record<string, number>)[modelName] ?? defaultCount
     }
     form.setValue('model_deduct_counts', newCounts, { shouldDirty: true })
     toast.success(
@@ -180,7 +180,7 @@ export function FreeRequestGrantSettingsSection({
   const handleRemoveModel = useCallback(
     (modelName: string) => {
       const current = { ...form.getValues('model_deduct_counts') }
-      delete current[modelName]
+      delete (current as Record<string, number>)[modelName]
       form.setValue('model_deduct_counts', current, { shouldDirty: true })
     },
     [form],
@@ -191,7 +191,7 @@ export function FreeRequestGrantSettingsSection({
       const numVal = parseInt(value, 10)
       if (isNaN(numVal) || numVal < 1) return
       const current = { ...form.getValues('model_deduct_counts') }
-      current[modelName] = numVal
+      ;(current as Record<string, number>)[modelName] = numVal
       form.setValue('model_deduct_counts', current, { shouldDirty: true })
     },
     [form],
@@ -297,7 +297,7 @@ export function FreeRequestGrantSettingsSection({
 
                 <FormField
                   control={form.control}
-                  name='admin_switch_valid_days'
+                  name='admin_switch_valid_hours'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
@@ -307,7 +307,7 @@ export function FreeRequestGrantSettingsSection({
                         <Input
                           type='number'
                           min={1}
-                          placeholder='3'
+                          placeholder='72'
                           {...field}
                         />
                       </FormControl>
@@ -453,7 +453,7 @@ export function FreeRequestGrantSettingsSection({
                           <Input
                             type='number'
                             min={1}
-                            value={count}
+                            value={count as number}
                             onChange={(e) =>
                               handleModelCountChange(modelName, e.target.value)
                             }

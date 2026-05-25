@@ -24,7 +24,7 @@ type FreeRequestGrantSetting struct {
 	Group                        string         `json:"group"`
 	AdminSwitchEnabled           bool           `json:"admin_switch_enabled"`
 	AdminSwitchCount             int            `json:"admin_switch_count"`
-	AdminSwitchValidDays         int            `json:"admin_switch_valid_days"`
+	AdminSwitchValidHours        int            `json:"admin_switch_valid_hours"`
 	DailyBalanceEnabled          bool           `json:"daily_balance_enabled"`
 	DailyBalanceCount            int            `json:"daily_balance_count"`
 	DailyBalanceThreshold        float64        `json:"daily_balance_threshold"`
@@ -107,7 +107,7 @@ func DefaultFreeRequestGrantSetting() FreeRequestGrantSetting {
 		Group:                        "",
 		AdminSwitchEnabled:           true,
 		AdminSwitchCount:             500,
-		AdminSwitchValidDays:         3,
+		AdminSwitchValidHours:        72,
 		DailyBalanceEnabled:          true,
 		DailyBalanceCount:            100,
 		DailyBalanceThreshold:        0,
@@ -216,7 +216,7 @@ func CreateAdminFreeRequestGrantOnGroupSwitch(userId int, oldGroup string, newGr
 	if strings.TrimSpace(oldGroup) == targetGroup || strings.TrimSpace(newGroup) != targetGroup {
 		return nil, nil
 	}
-	if setting.AdminSwitchCount <= 0 || setting.AdminSwitchValidDays <= 0 {
+	if setting.AdminSwitchCount <= 0 || setting.AdminSwitchValidHours <= 0 {
 		return nil, nil
 	}
 	if setting.CampaignEndTime > 0 && GetDBTimestamp() >= setting.CampaignEndTime {
@@ -244,7 +244,7 @@ func CreateAdminFreeRequestGrantOnGroupSwitch(userId int, oldGroup string, newGr
 		TotalCount: setting.AdminSwitchCount,
 		UsedCount:  0,
 		StartTime:  now,
-		EndTime:    now + int64(setting.AdminSwitchValidDays)*24*3600,
+		EndTime:    now + int64(setting.AdminSwitchValidHours)*3600,
 		Status:     FreeRequestGrantStatusActive,
 	}
 	if setting.CampaignEndTime > 0 && grant.EndTime > setting.CampaignEndTime {
@@ -253,7 +253,7 @@ func CreateAdminFreeRequestGrantOnGroupSwitch(userId int, oldGroup string, newGr
 	if err := DB.Create(grant).Error; err != nil {
 		return nil, err
 	}
-	RecordLog(userId, LogTypeManage, fmt.Sprintf("切换到%s分组，赠送%d次免费请求，有效期%d天", targetGroup, setting.AdminSwitchCount, setting.AdminSwitchValidDays))
+	RecordLog(userId, LogTypeManage, fmt.Sprintf("切换到%s分组，赠送%d次免费请求，有效期%d小时", targetGroup, setting.AdminSwitchCount, setting.AdminSwitchValidHours))
 	return grant, nil
 }
 
