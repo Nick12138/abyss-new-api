@@ -1,0 +1,29 @@
+# Frontend Development Server
+#
+# Usage (must start backend first):
+#   1. docker compose -f docker-compose.dev.yml up -d
+#   2. docker compose -f docker-compose.frontend-dev.yml up -d
+#   3. Open http://localhost:3001
+#
+# Stop:
+#   docker compose -f docker-compose.frontend-dev.yml down
+
+services:
+  frontend:
+    image: oven/bun:1
+    container_name: new-api-frontend-dev
+    restart: unless-stopped
+    working_dir: /app
+    command: ["sh", "-c", "bun install && bun run dev"]
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./web/default:/app
+    environment:
+      - VITE_REACT_APP_SERVER_URL=http://new-api-dev:3000
+    networks:
+      - abyss-new-api_dev-network
+
+networks:
+  abyss-new-api_dev-network:
+    external: true
