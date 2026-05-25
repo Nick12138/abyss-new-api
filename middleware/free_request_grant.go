@@ -51,7 +51,7 @@ func FreeRequestGrantLimit() gin.HandlerFunc {
 			return
 		}
 		if reservation == nil {
-			abortWithOpenAiMessage(c, http.StatusTooManyRequests, fmt.Sprintf("%s分组免费请求次数不足", setting.Group))
+			abortWithOpenAiMessage(c, http.StatusForbidden, "免费请求次数已用完")
 			return
 		}
 

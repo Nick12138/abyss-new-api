@@ -50,8 +50,10 @@ import type { PricingModel } from '@/features/pricing/types'
 const schema = z.object({
   enabled: z.boolean(),
   group: z.string(),
+  admin_switch_enabled: z.boolean(),
   admin_switch_count: z.coerce.number().int().min(0),
   admin_switch_valid_hours: z.coerce.number().int().min(1),
+  daily_balance_enabled: z.boolean(),
   daily_balance_count: z.coerce.number().int().min(0),
   daily_balance_threshold: z.coerce.number().min(0),
   deduct_count_per_success: z.coerce.number().int().min(1),
@@ -63,8 +65,10 @@ type Values = z.infer<typeof schema>
 const DEFAULT_VALUES: Values = {
   enabled: false,
   group: '',
+  admin_switch_enabled: true,
   admin_switch_count: 500,
   admin_switch_valid_hours: 72,
+  daily_balance_enabled: true,
   daily_balance_count: 100,
   daily_balance_threshold: 0,
   deduct_count_per_success: 1,
@@ -78,10 +82,14 @@ function parseSetting(jsonStr?: string): Values {
     return {
       enabled: parsed.enabled ?? DEFAULT_VALUES.enabled,
       group: parsed.group ?? DEFAULT_VALUES.group,
+      admin_switch_enabled:
+        parsed.admin_switch_enabled ?? DEFAULT_VALUES.admin_switch_enabled,
       admin_switch_count:
         parsed.admin_switch_count ?? DEFAULT_VALUES.admin_switch_count,
       admin_switch_valid_hours:
         parsed.admin_switch_valid_hours ?? DEFAULT_VALUES.admin_switch_valid_hours,
+      daily_balance_enabled:
+        parsed.daily_balance_enabled ?? DEFAULT_VALUES.daily_balance_enabled,
       daily_balance_count:
         parsed.daily_balance_count ?? DEFAULT_VALUES.daily_balance_count,
       daily_balance_threshold:
@@ -116,6 +124,8 @@ export function FreeRequestGrantSettingsSection({
   const { isDirty, isSubmitting } = form.formState
   const enabled = form.watch('enabled')
   const group = form.watch('group')
+  const adminSwitchEnabled = form.watch('admin_switch_enabled')
+  const dailyBalanceEnabled = form.watch('daily_balance_enabled')
   const modelDeductCounts = form.watch('model_deduct_counts')
   const defaultDeductCount = form.watch('deduct_count_per_success')
 
@@ -270,6 +280,31 @@ export function FreeRequestGrantSettingsSection({
                 )}
               />
 
+              <FormField
+                control={form.control}
+                name='admin_switch_enabled'
+                render={({ field }) => (
+                  <SettingsSwitchItem>
+                    <SettingsSwitchContent>
+                      <FormLabel>{t('Enable registration grant')}</FormLabel>
+                      <FormDescription>
+                        {t(
+                          'Grant free requests when admin switches user to the target group'
+                        )}
+                      </FormDescription>
+                    </SettingsSwitchContent>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={updateOption.isPending || isSubmitting}
+                      />
+                    </FormControl>
+                  </SettingsSwitchItem>
+                )}
+              />
+
+              {adminSwitchEnabled && (
               <div className='grid gap-6 sm:grid-cols-2'>
                 <FormField
                   control={form.control}
@@ -319,7 +354,33 @@ export function FreeRequestGrantSettingsSection({
                   )}
                 />
               </div>
+              )}
 
+              <FormField
+                control={form.control}
+                name='daily_balance_enabled'
+                render={({ field }) => (
+                  <SettingsSwitchItem>
+                    <SettingsSwitchContent>
+                      <FormLabel>{t('Enable daily grant')}</FormLabel>
+                      <FormDescription>
+                        {t(
+                          'Grant free requests daily when user balance meets the threshold'
+                        )}
+                      </FormDescription>
+                    </SettingsSwitchContent>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={updateOption.isPending || isSubmitting}
+                      />
+                    </FormControl>
+                  </SettingsSwitchItem>
+                )}
+              />
+
+              {dailyBalanceEnabled && (
               <div className='grid gap-6 sm:grid-cols-2'>
                 <FormField
                   control={form.control}
@@ -372,6 +433,7 @@ export function FreeRequestGrantSettingsSection({
                   )}
                 />
               </div>
+              )}
 
               <FormField
                 control={form.control}
