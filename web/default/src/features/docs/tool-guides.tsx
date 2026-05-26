@@ -106,13 +106,15 @@ type ToolGuide = {
   iconNames: string[]
   imageUrl?: string
   summary: string
-  modelHint: string
+  modelHint?: string
   modelHintUrl?: string
   endpointTypes?: string[]
   useAllPricingModels?: boolean
   copyValue?: string
   copyLabel?: string
+  tip?: string
   steps: GuideStep[]
+  hidden?: boolean
 }
 
 const recommendedTools: ToolId[] = ['claude-code', 'cursor', 'cherry-studio']
@@ -1236,6 +1238,7 @@ const guides: ToolGuide[] = [
   },
   {
     id: 'openclaw',
+    hidden: true,
     name: 'OpenClaw',
     iconNames: ['OpenClaw.Color'],
     summary:
@@ -1246,27 +1249,27 @@ const guides: ToolGuide[] = [
       {
         title: 'Install',
         description:
-          'Install OpenClaw after Node.js and the CLI runtime are ready.',
+          'Install the OpenClaw CLI globally, then confirm the binary is available.',
         commands: {
           mac: [
             {
-              title: 'OpenClaw',
+              title: 'Install with npm',
               language: 'bash',
-              code: 'curl -fsSL https://openclaw.ai/install.sh | bash\nopenclaw --version',
+              code: 'npm install -g openclaw\nopenclaw --version',
             },
           ],
           windows: [
             {
-              title: 'OpenClaw',
+              title: 'Install with npm',
               language: 'powershell',
               code: 'npm install -g openclaw\nopenclaw --version',
             },
           ],
           linux: [
             {
-              title: 'OpenClaw',
+              title: 'Install with npm',
               language: 'bash',
-              code: 'curl -fsSL https://openclaw.ai/install.sh | bash\nopenclaw --version',
+              code: 'npm install -g openclaw\nopenclaw --version',
             },
           ],
         },
@@ -1280,39 +1283,28 @@ const guides: ToolGuide[] = [
             {
               title: '~/.openclaw/openclaw.json',
               language: 'json',
-              code: `{\n  "providers": {\n    "new-api": {\n      "type": "openai-compatible",\n      "baseURL": "${endpoint}",\n      "apiKey": "$OPENAI_API_KEY",\n      "model": "gpt-5.1"\n    }\n  }\n}`,
-            },
-            {
-              title: 'Environment',
-              language: 'bash',
-              code: `export OPENAI_API_KEY="${apiKey}"`,
+              code: `mkdir -p ~/.openclaw\ncat > ~/.openclaw/openclaw.json << 'EOF'\n{\n  "providers": {\n    "new-api": {\n      "type": "openai-compatible",\n      "baseURL": "${endpoint}",\n      "apiKey": "${apiKey}",\n      "model": "gpt-5.1"\n    }\n  }\n}\nEOF`,
+              note: 'Replace the model value with the model you want to use. Open a new terminal after saving.',
             },
           ],
           windows: [
             {
               title: '%USERPROFILE%\\.openclaw\\openclaw.json',
-              language: 'json',
-              code: `{\n  "providers": {\n    "new-api": {\n      "type": "openai-compatible",\n      "baseURL": "${endpoint}",\n      "apiKey": "%OPENAI_API_KEY%",\n      "model": "gpt-5.1"\n    }\n  }\n}`,
-            },
-            {
-              title: 'Environment',
               language: 'powershell',
-              code: `$env:OPENAI_API_KEY="${apiKey}"`,
+              code: `$dir = "$env:USERPROFILE\\.openclaw"\nif (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force }\nSet-Content -Path "$dir\\openclaw.json" -Value @'\n{\n  "providers": {\n    "new-api": {\n      "type": "openai-compatible",\n      "baseURL": "${endpoint}",\n      "apiKey": "${apiKey}",\n      "model": "gpt-5.1"\n    }\n  }\n}\n'@`,
+              note: 'Replace the model value with the model you want to use. Open a new terminal after saving.',
             },
           ],
           linux: [
             {
               title: '~/.openclaw/openclaw.json',
               language: 'json',
-              code: `{\n  "providers": {\n    "new-api": {\n      "type": "openai-compatible",\n      "baseURL": "${endpoint}",\n      "apiKey": "$OPENAI_API_KEY",\n      "model": "gpt-5.1"\n    }\n  }\n}`,
-            },
-            {
-              title: 'Environment',
-              language: 'bash',
-              code: `export OPENAI_API_KEY="${apiKey}"`,
+              code: `mkdir -p ~/.openclaw\ncat > ~/.openclaw/openclaw.json << 'EOF'\n{\n  "providers": {\n    "new-api": {\n      "type": "openai-compatible",\n      "baseURL": "${endpoint}",\n      "apiKey": "${apiKey}",\n      "model": "gpt-5.1"\n    }\n  }\n}\nEOF`,
+              note: 'Replace the model value with the model you want to use. Open a new terminal after saving.',
             },
           ],
         },
+        tip: 'CC Switch is recommended for managing and switching provider configs across Claude Code, Codex, Gemini CLI, OpenClaw, and other coding agents.',
       },
       {
         title: 'Start',
@@ -1346,6 +1338,7 @@ const guides: ToolGuide[] = [
   },
   {
     id: 'cherry-studio',
+    hidden: true,
     name: 'Cherry Studio',
     iconNames: ['CherryStudio.Color'],
     summary:
@@ -1478,6 +1471,7 @@ const guides: ToolGuide[] = [
   },
   {
     id: 'cursor',
+    hidden: true,
     name: 'Cursor',
     iconNames: ['Cursor.Color'],
     summary:
@@ -1560,6 +1554,7 @@ const guides: ToolGuide[] = [
   },
   {
     id: 'cline',
+    hidden: true,
     name: 'Cline',
     iconNames: ['Cline.Color'],
     summary:
@@ -1642,6 +1637,7 @@ const guides: ToolGuide[] = [
   },
   {
     id: 'continue',
+    hidden: true,
     name: 'Continue',
     iconNames: ['Continue.Color'],
     summary:
@@ -1733,6 +1729,7 @@ const guides: ToolGuide[] = [
   },
   {
     id: 'chatbox',
+    hidden: true,
     name: 'Chatbox',
     iconNames: ['ChatBox.Color'],
     summary:
@@ -1815,6 +1812,7 @@ const guides: ToolGuide[] = [
   },
   {
     id: 'opencode',
+    hidden: true,
     name: 'OpenCode',
     iconNames: ['OpenCode.Color'],
     summary:
@@ -1938,6 +1936,7 @@ const guides: ToolGuide[] = [
   },
   {
     id: 'open-webui',
+    hidden: true,
     name: 'Open WebUI',
     iconNames: ['OpenWebUI.Color'],
     summary:
@@ -2025,6 +2024,7 @@ const guides: ToolGuide[] = [
   },
   {
     id: 'lobechat',
+    hidden: true,
     name: 'LobeChat / LobeHub',
     iconNames: ['LobeHub.Color'],
     summary:
@@ -2720,9 +2720,14 @@ export function ToolGuides() {
     refetchOnWindowFocus: true,
   })
 
+  const visibleGuides = useMemo(
+    () => guides.filter((item) => !item.hidden),
+    []
+  )
   const baseGuide = useMemo(
-    () => guides.find((item) => item.id === activeTool) ?? guides[0],
-    [activeTool]
+    () =>
+      visibleGuides.find((item) => item.id === activeTool) ?? visibleGuides[0],
+    [activeTool, visibleGuides]
   )
   const guidePricingModels = useMemo(
     () => getGuidePricingModels(baseGuide, pricingQuery.data?.data ?? []),
@@ -2810,7 +2815,7 @@ export function ToolGuides() {
         <div className='grid gap-6 lg:grid-cols-[20rem_1fr]'>
           <aside className='lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto'>
             <div className='grid gap-2'>
-              {guides.map((item) => (
+              {visibleGuides.map((item) => (
                 <ToolButton
                   key={item.id}
                   guide={item}
