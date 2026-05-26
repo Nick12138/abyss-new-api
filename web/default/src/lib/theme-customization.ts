@@ -169,6 +169,7 @@ export const THEME_COOKIE_KEYS = {
 export const PRESET_DEFAULT_FONT: Partial<
   Record<ThemePreset, ResolvedThemeFont>
 > = {
+  default: 'sans',
   anthropic: 'serif',
 }
 
