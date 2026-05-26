@@ -2239,6 +2239,7 @@ const guides: ToolGuide[] = [
   },
   {
     id: 'troubleshooting',
+    hidden: true,
     name: '常见问题排查',
     iconNames: [],
     summary:
@@ -2516,7 +2517,9 @@ function getSelectedGuide(guide: ToolGuide, selectedModel?: string): ToolGuide {
           system,
           commands?.map((command) => ({
             ...command,
-            code: command.code.split(guide.modelHint).join(selectedModel),
+            code: guide.modelHint
+              ? command.code.split(guide.modelHint).join(selectedModel)
+              : command.code,
           })),
         ])
       ) as Partial<Record<SystemId, CommandBlock[]>>,
